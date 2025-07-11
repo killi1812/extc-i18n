@@ -2,9 +2,6 @@ version: "3"
 
 vars:
   BINARY_DIR: ./
-  # TODO: check how dynamic variables work https://taskfile.dev/reference/schema/#variable
-  DYNAMIC:
-    sh: echo "dynamic"
 
 tasks:
   default:
@@ -31,6 +28,7 @@ tasks:
 
   coverage:
     description: creates project coverage file
+    # TODO: Implement
     silent: true
 
   list-tools:
