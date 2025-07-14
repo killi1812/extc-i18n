@@ -1,3 +1,4 @@
+// Package version provides basic version infromation for app
 package version
 
 import (
