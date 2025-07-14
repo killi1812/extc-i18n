@@ -1,4 +1,4 @@
-// Package translate provides main functionalyti extracting translate keys
+// Package translate provides main functionality extracting translate keys
 package translate
 
 import (
@@ -18,7 +18,7 @@ type TranslateCmd struct {
 }
 
 // Execute implements subcommands.Command.
-func (t *TranslateCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
+func (t *TranslateCmd) Execute(ctx context.Context, f *flag.FlagSet, args ...any) subcommands.ExitStatus {
 	zap.S().Debugf("cli args: %+v", t)
 	return 0
 }

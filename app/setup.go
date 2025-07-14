@@ -10,10 +10,20 @@ import (
 func Setup() {
 	// Logger setup
 	{
-		err := devLoggerSetup()
-		if err != nil {
-			fmt.Printf("err: %v\n", err)
-			panic("faled to setup logger")
+		var err error
+
+		if Build == BuildDev {
+			err = devLoggerSetup()
+			if err != nil {
+				fmt.Printf("err: %v\n", err)
+				panic("faled to setup logger")
+			}
+		} else {
+			err = prodLoggerSetup()
+			if err != nil {
+				fmt.Printf("err: %v\n", err)
+				panic("faled to setup logger")
+			}
 		}
 	}
 }
