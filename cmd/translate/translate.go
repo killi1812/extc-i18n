@@ -26,7 +26,7 @@ type TranslateCmd struct {
 	// outPath is path to translate folder
 	outPath string
 	// results stores locations of translate keys
-	results []result
+	results result
 }
 
 // Execute implements subcommands.Command.
@@ -63,7 +63,7 @@ func (t *TranslateCmd) Usage() string {
 }
 
 // result defines location of translate key
-type result struct {
+type resultold struct {
 	// path to folder
 	path string
 	// line line of code
@@ -74,6 +74,7 @@ type result struct {
 	//
 	value keyValue
 }
+
 type keyValue struct {
 	group string
 	name  string
@@ -126,43 +127,44 @@ func (t *TranslateCmd) Search() error {
 	return nil
 }
 
-func Parse(data string) ([]result, error) {
+func Parse(data string) (result, error) {
 	lines := strings.Split(data, "\n")
 	lines = lines[:len(lines)-1]
-	results := make([]result, len(lines))
+	results := make(result)
 
 	for i, line := range lines {
 		zap.S().Debugf("Working on index: %d, line: %s", i, line)
 		parts := strings.Split(line, ":")
 
+		var arg args
 		// Set path
-		results[i].path = strings.TrimSpace(parts[0])
+		arg.path = strings.TrimSpace(parts[0])
 
 		// Set line
 		tmp, err := strconv.Atoi(strings.TrimSpace(parts[1]))
 		if err != nil {
 			zap.S().DPanicf("Failed to parse result line got: %v, expected int", parts[1])
 		}
-		results[i].line = tmp
+		arg.line = tmp
 
 		// Set position
 		tmp, err = strconv.Atoi(strings.TrimSpace(parts[2]))
 		if err != nil {
 			zap.S().DPanicf("Failed to parse result line got: %v, expected int", parts[2])
 		}
-		results[i].position = tmp
+		arg.position = tmp
 
 		// Extracting key values
 		{
 			local := parts[3]
 			zap.S().Debugf("Extracting key from %s", local)
 
-			// TODO: remove everything left of '
-			local = local[results[i].position:]
+			iprefix := indexRune(local, '\'')
+			local = local[iprefix+1:]
 			zap.S().Debugf("Removed left extra %s", local)
 
-			// TODO: remove everything right of of '
-			local = local[results[i].position:]
+			isuffix := indexRune(local, '\'')
+			local = local[:isuffix]
 			zap.S().Debugf("Removed right extra %s", local)
 
 			parts := strings.Split(local, ".")
@@ -170,12 +172,24 @@ func Parse(data string) ([]result, error) {
 				zap.S().DPanicf("Bad input (%s), needs look like: GROUP.NAME", data)
 			}
 
-			results[i].value = keyValue{
-				group: parts[0],
-				name:  parts[1],
-			}
+			group := parts[0]
+			arg.name = parts[1]
+
+			results.Add(group, arg)
 		}
 	}
 
 	return results, nil
+}
+
+// indexRune will find first occurence of rune
+//
+// if there is no rune in given string it will return -1
+func indexRune(data string, c rune) int {
+	for i, char := range data {
+		if char == c {
+			return i
+		}
+	}
+	return -1
 }
