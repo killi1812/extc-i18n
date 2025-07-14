@@ -13,6 +13,7 @@ type value struct {
 	locs []location
 }
 
+// represents location of key in the project
 type location struct {
 	// path to folder
 	path string
@@ -22,7 +23,8 @@ type location struct {
 	position int
 }
 
-type args struct {
+// arguments for creating values
+type valargs struct {
 	name string
 	// path to folder
 	path string
@@ -32,10 +34,12 @@ type args struct {
 	position int
 }
 
-// Add
+// Add will create a new group with new value
 //
-// else Adds only new location
-func (col result) Add(key string, val args) bool {
+// if the group exist and only the value is new, value will be appended in the array
+//
+// else only adds new location to existing group-value pair
+func (col result) Add(key string, val valargs) bool {
 	index := slices.IndexFunc(col[key], func(e value) bool {
 		return e.name == val.name
 	})

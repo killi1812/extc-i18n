@@ -136,7 +136,7 @@ func Parse(data string) (result, error) {
 		zap.S().Debugf("Working on index: %d, line: %s", i, line)
 		parts := strings.Split(line, ":")
 
-		var arg args
+		var arg valargs
 		// Set path
 		arg.path = strings.TrimSpace(parts[0])
 
